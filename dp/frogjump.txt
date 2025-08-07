@@ -1,0 +1,119 @@
+reat! You're exploring the Frog Jump problem (also known as Minimum Energy Climbing Stairs with Heights) — a classic Dynamic Programming problem from the Striver DP series (DP-3).
+
+Let me walk you through everything:
+
+🐸 Problem Summary
+You're given an array height[] of size N (stairs).
+
+A frog starts at stair 0 and wants to reach stair N-1.
+
+It can jump 1 or 2 steps at a time.
+
+Energy spent for a jump from stair i to stair j is:
+
+abs(height[i] - height[j])
+abs(height[i] - height[j])
+Goal: Find the minimum total energy used to reach the last stair.
+
+✅ Example
+java
+Copy
+Edit
+height = [30, 10, 60, 10, 60, 50]
+Optimal path:
+
+pgsql
+Copy
+Edit
+0 → 1 (cost 20)
+1 → 3 (cost 0)
+3 → 5 (cost 40)
+Total = 20 + 0 + 40 = 60
+🔁 Recursion + Memoization Java Code Explained
+🔧 Code
+java
+Copy
+Edit
+static int solve(int ind, int[] height, int[] dp) {
+    if (ind == 0) return 0;  // Base case
+
+    if (dp[ind] != -1) return dp[ind];  // Memoized result
+
+    // Jump from i-1
+    int jumpOne = solve(ind - 1, height, dp) + Math.abs(height[ind] - height[ind - 1]);
+
+    // Jump from i-2 (if possible)
+    int jumpTwo = Integer.MAX_VALUE;
+    if (ind > 1)
+        jumpTwo = solve(ind - 2, height, dp) + Math.abs(height[ind] - height[ind - 2]);
+
+    // Store and return min energy
+    return dp[ind] = Math.min(jumpOne, jumpTwo);
+}
+💡 Main Method
+java
+Copy
+Edit
+public static void main(String[] args) {
+    int[] height = {30, 10, 60, 10, 60, 50};
+    int n = height.length;
+    int[] dp = new int[n];
+    Arrays.fill(dp, -1);
+
+    System.out.println(solve(n - 1, height, dp));  // Output: 40
+}
+📦 Time & Space Complexity
+Time: O(N)
+Only N unique subproblems due to memoization.
+
+Space: O(N)
+
+dp[] array of size N
+
+Recursion call stack (max depth = N)
+
+🚀 Optimization: Tabulation (Bottom-Up DP)
+java
+Copy
+Edit
+public static int frogJump(int[] height) {
+    int n = height.length;
+    int[] dp = new int[n];
+    dp[0] = 0;
+
+    for (int i = 1; i < n; i++) {
+        int jumpOne = dp[i - 1] + Math.abs(height[i] - height[i - 1]);
+        int jumpTwo = Integer.MAX_VALUE;
+        if (i > 1)
+            jumpTwo = dp[i - 2] + Math.abs(height[i] - height[i - 2]);
+        dp[i] = Math.min(jumpOne, jumpTwo);
+    }
+
+    return dp[n - 1];
+}
+💾 Further Space Optimization (O(1) space)
+java
+Copy
+Edit
+public static int frogJump(int[] height) {
+    int prev1 = 0, prev2 = 0;
+
+    for (int i = 1; i < height.length; i++) {
+        int jumpOne = prev1 + Math.abs(height[i] - height[i - 1]);
+        int jumpTwo = Integer.MAX_VALUE;
+        if (i > 1)
+            jumpTwo = prev2 + Math.abs(height[i] - height[i - 2]);
+        int curr = Math.min(jumpOne, jumpTwo);
+        prev2 = prev1;
+        prev1 = curr;
+    }
+
+    return prev1;
+}
+🧠 Key DP Concepts Used
+Optimal substructure: Min energy to reach i uses min from i-1 or i-2
+
+Overlapping subproblems: Same i may be called multiple times → memoization helps
+
+Greedy doesn't work: local minimum choices don’t guarantee global minimum
+
